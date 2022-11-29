@@ -1,18 +1,25 @@
 #!/bin/ksh
-FFMPEG='ffmpeg'
-CAMERA_LIST='/usr/local/webcam/cameras.txt'
-DIR='/var/webcam/'
-QUALITY=25
+
+. $(dirname "$0")/conf.sh
 
 # Get current date and time
 DATETIME=$(date '+%Y-%m-%d_%H-%M')
 
-# Foreach line
+# Foreach webcam entry
 while read line; do
-	set -A arr $line
-	CAMDIR="${DIR}${arr[0]}/img/"
-	mkdir -m 700 -p "${CAMDIR}"
-	ffmpeg -hide_banner -loglevel error -nostats -y -i "${arr[1]}" -f image2 -q:v $QUALITY -vframes 1 "${CAMDIR}${DATETIME}.jpg" &
+	set -A wcparam $line
+
+	# $wcparam[0] = camera name
+	# $wcparam[1] = JPEG quality
+	# $wcparam[2] = ffmpeg -crf value of the timelapse video
+	# $wcparam[3] = RTSP stream URI
+
+	CAMDIR="${WORKDIR}${wcparam[0]}/"
+	IMGDIR="${CAMDIR}img/"
+	IMG="${IMGDIR}${DATETIME}.jpg"
+	mkdir -m 700 -p "$IMGDIR"
+	"$FFMPEG" $FFMPEG_COMMON -i "${wcparam[3]}" -f image2 -q:v ${wcparam[1]} -vframes 1 "$IMG" &
+	echo "file '$IMG'" >> "${CAMDIR}/unprocessed.txt"
 done < "$CAMERA_LIST"
 
 exit 0
