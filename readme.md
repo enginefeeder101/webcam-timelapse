@@ -13,12 +13,12 @@ Korn shell `ksh` (OpenBSD's default shell)
 ### Clone & file copy
 
 	cd /tmp/
-	git clone <REPO_URL>
+	git clone https://github.com/cesiumcz/webcam-timelapse.git
 	install -d -m 755 -o root -g _webcam /usr/local/webcam/
 	install -m 770 -o root -g _webcam conf.sh /usr/local/webcam/
 	install -m 754 -o root -g _webcam snap.sh /usr/local/webcam/
 	install -m 754 -o root -g _webcam render.sh /usr/local/webcam/
-	rm -rf /tmp/webcam_timelapse/
+	rm -rf /tmp/webcam-timelapse/
 
 ### Configuration
 #### Paths
