@@ -18,7 +18,7 @@ while read line; do
 	IMGDIR="${CAMDIR}img/"
 	IMG="${IMGDIR}${DATETIME}.jpg"
 	mkdir -m 700 -p "$IMGDIR"
-	"$FFMPEG" $FFMPEG_COMMON -i "${wcparam[3]}" -f image2 -q:v ${wcparam[1]} -vframes 1 "$IMG" &
+	"$FFMPEG" $FFMPEG_COMMON -skip_frame nokey -i "${wcparam[3]}" -vsync vfr -f image2 -q:v ${wcparam[1]} -frames:v 1 "$IMG" &
 	echo "file '$IMG'" >> "${CAMDIR}/unprocessed.txt"
 done < "$CAMERA_LIST"
 
