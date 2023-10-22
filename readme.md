@@ -1,34 +1,21 @@
-# cesium webcam timelapse
-Shell script-based routine that takes snapshots from IP webcams and periodically creates a timelapse video using FFmpeg.
-
-## Prerequisities
-Korn shell `ksh` (OpenBSD's default shell)
+# webcam-timelapse
+Docker image that takes snapshots from IP webcams and periodically creates a timelapse video using FFmpeg.
 
 ## Installation
-### System user
 
-	useradd -c "Webcam routine" -b /var/webcam/ -d /var/webcam/ -s /sbin/nologin _webcam
-	install -d -m 770 -o root -g _webcam /var/webcam/
-
-### Clone & file copy
-
-	cd /tmp/
-	git clone https://github.com/cesiumcz/webcam-timelapse.git
-	install -d -m 755 -o root -g _webcam /usr/local/webcam/
-	install -m 770 -o root -g _webcam conf.sh /usr/local/webcam/
-	install -m 754 -o root -g _webcam snap.sh /usr/local/webcam/
-	install -m 754 -o root -g _webcam render.sh /usr/local/webcam/
-	rm -rf /tmp/webcam-timelapse/
+	git clone https://github.com/enginefeeder101/webcam-timelapse.git
+	cd webcam-timelapse
+	docker compose up
 
 ### Configuration
 #### Paths
 Set your environment-specific paths and ffmpeg parameters in `conf.sh`
 
-	vim /usr/local/webcam/conf.sh
+	vim config/conf.sh
 
 #### Camera list
 
-	vim /usr/local/webcam/cameras.txt
+	vim config/cameras.txt
 
 For each webcam, insert a line according to the following syntax:
 
@@ -47,16 +34,27 @@ Example contents of `cameras.txt`
 
 Set proper permissions (`cameras.txt` is likely to contain credentials)
 
-	chown -R root:_webcam /usr/local/webcam/
-	chmod 660 /usr/local/webcam/cameras.txt
+	chown user:group config/cameras.txt
+	chmod 660 config/cameras.txt
 
 ### Cron
 Grab a snapshot every hour, and render video once a day. In this manner, one day equals 1 second in the final 24 FPS timelapse video.  
 **NOTICE: Prevent render to execute at the same time as snap and set sufficient delay as follows.**
 
-	crontab -e -u _webcam
-	0 * * * * /usr/local/webcam/snap.sh
-	5 3 * * * /usr/local/webcam/render.sh
+	vim config/schedule
+	
+	0 * * * * snap.sh
+	5 3 * * * render.sh
+
+### PUID & PGID
+Docker runs all of its containers under the root user. This means that the processes running inside the container also run as root.
+This causes issue in file management within the container's mapped volumes. If the process is running under root, all files and directories created  will be owned by root, thus becoming inaccessible by you. Using the PUID and PGID allows the container to map the container's internal user to a user on the host machine.
+
+	vim docker-compose.yaml
+
+	environment:
+	- PUID=1000
+	- PGID=1000
 
 ## Changing timelapse video parameters
 Since `render.sh` appends a new video segment at the end of the timelapse without reencoding it completely, any change of output timelapse video parameters (FPS, CRF, Preset) must be followed by a complete reencode.  
@@ -73,12 +71,8 @@ Transfer the archive to dedicated machine and reencode the video
 
 ## Testing
 
-	su -l _webcam /usr/local/webcam/snap.sh
-	su -l _webcam /usr/local/webcam/render.sh
-
-Or alternative using `doas` command:
-
-	doas -u _webcam /usr/local/webcam/snap.sh
+	docker compose exec --user 1000 webcam-timelapse snap.sh
+	docker compose exec --user 1000 webcam-timelapse render.sh
 
 ## Modus operandi
 **`snap.sh`** does the following sequentially for each webcam:
@@ -94,7 +88,7 @@ Or alternative using `doas` command:
 *A temporary video is necessary because ffmpeg cannot append images directly to the existing video, it supports video concatenation instead.*
 
 ### Directory structure
-	/var/webcam/
+	/data/
 	|-- cam1
 	|   |-- img
 	|   |   |-- 2022-08-24_10-00.jpg
@@ -109,6 +103,7 @@ Or alternative using `doas` command:
 	    `-- unprocessed.txt
 
 ## Author
+[Engine Feeder](https://github.com/enginefeeder101/webcam-timelapse), 2023
 [Matyáš Vohralík](https://mv.cesium.cz), 2022
 
 ## License

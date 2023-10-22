@@ -1,0 +1,32 @@
+#!/bin/sh
+
+set -e
+
+if [ ! -f "/etc/container-inited" ]; then
+    echo "${PUSER:-croner}:x:${PUID:-1000}:${PGID:-1000}:Cron:/config:/sbin/nologin" >> /etc/passwd
+    echo "${PGROUP:-croner}:x:${PGID:-1000}:${PUSER:-croner}" >> /etc/group
+    touch /etc/container-inited
+fi
+
+if [ -f "/config/schedule" ]; then
+    cat /config/schedule | crontab -u "${PUSER:-croner}" -
+else
+    echo '[WARNING] No cron schedule specified in /config/schedule'
+    echo 'Example configuration:'
+    echo '0 * * * * snap.sh'
+    echo '5 3 * * * render.sh'
+    echo '> NOTICE: Prevent render to execute at the same time as snap and set sufficient delay as follows.'
+fi
+
+if [ ! -s "/config/cameras.txt" ]; then
+    echo '[WARNING] No camera configuration specified in /config/cameras.txt'
+    echo 'Example configuration:'
+    echo 'entrance 4 28 rtsp://192.168.1.100/user=monitor_password=pdTzQLK6Iq_channel=1_stream=0.sdp'
+    echo 'backyard 4 28 rtsp://192.168.1.101/user=monitor_password=6oLA64U2sG_channel=1_stream=0.sdp'
+    echo '> cam_name = unique string camera name. Use short and simple names.'
+    echo '> jpg_quality = JPEG snapshot quality. The normal range for JPEG is 2-31 with 31 being the worst quality.'
+    echo '> ffmpeg_crf = Use Constant Rate Factor (CRF) to control the quality of the timelapse video. See H.265 documentation.'
+    echo '> rtsp_uri = RTSP stream URI'
+fi
+
+exec "$@"

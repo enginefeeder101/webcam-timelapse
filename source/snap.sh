@@ -1,6 +1,6 @@
 #!/bin/ksh
 
-. $(dirname "$0")/conf.sh
+. /config/conf.sh
 
 # Get current date and time
 DATETIME=$(date '+%Y-%m-%d_%H-%M')

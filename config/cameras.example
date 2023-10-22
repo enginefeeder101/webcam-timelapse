@@ -1,0 +1,2 @@
+entrance 4 28 rtsp://192.168.1.100/user=monitor_password=pdTzQLK6Iq_channel=1_stream=0.sdp
+backyard 4 28 rtsp://192.168.1.101/user=monitor_password=6oLA64U2sG_channel=1_stream=0.sdp

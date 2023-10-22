@@ -1,9 +1,9 @@
 #!/bin/sh
-WORKDIR='/var/webcam/'
+WORKDIR='/data/'
 TMPDIR='/tmp/'
-CAMERA_LIST='/usr/local/webcam/cameras.txt'
+CAMERA_LIST='/config/cameras.txt'
 FFMPEG='ffmpeg'
-FFMPEG_FPS=12
+FFMPEG_FPS=60
 FFMPEG_PRESET='slow'
 
 # Do not modify

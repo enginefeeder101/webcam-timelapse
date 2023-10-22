@@ -1,6 +1,6 @@
 #!/bin/ksh
 
-. $(dirname "$0")/conf.sh
+. /config/conf.sh
 
 TMP_UNPROCESSED="${TMPDIR}unprocessed.txt"
 TMP_CONCAT="${TMPDIR}concat.txt"
@@ -29,9 +29,13 @@ while read line; do
 	"$FFMPEG" $FFMPEG_COMMON -r $FFMPEG_FPS -f concat -safe 0 -i "$TMP_UNPROCESSED" -c:v libx265 -crf ${wcparam[2]} -preset $FFMPEG_PRESET -x265-params log-level=error -pix_fmt yuv420p "$TMP_APPEND"
 
 	# Append the video at the end of timelapse using concat demuxer
-	"$FFMPEG" $FFMPEG_COMMON -f concat -safe 0 -i "$TMP_CONCAT" -c copy "$TMP_TIMELAPSE"
+	if [ -f "$TIMELAPSE" ]; then
+		"$FFMPEG" $FFMPEG_COMMON -f concat -safe 0 -i "$TMP_CONCAT" -c copy "$TMP_TIMELAPSE"
+		mv -f "$TMP_TIMELAPSE" "$TIMELAPSE"
+	else
+		mv -f "$TMP_APPEND" "$TIMELAPSE"
+	fi
 
-	mv -f "$TMP_TIMELAPSE" "$TIMELAPSE"
 	rm -f "$TMP_APPEND" "$TMP_UNPROCESSED"
 
 done < "$CAMERA_LIST"

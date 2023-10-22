@@ -1,0 +1,12 @@
+services:
+  webcam-timelapse:
+    build: source
+    environment:
+      - PUID=1000
+      - PGID=1000
+    restart: always
+    security_opt:
+      - seccomp:unconfined
+    volumes:
+      - ./config:/config/
+      - ./data:/data
