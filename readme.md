@@ -22,7 +22,7 @@ For each webcam, insert a line according to the following syntax:
 	cam_name jpg_quality ffmpeg_crf rtsp_uri
 
 - *cam_name* = unique string camera name. Use short and simple names.
-- *jpg_quality* = JPEG snapshot quality. The normal range for JPEG is 2-31 with 31 being the worst quality. Can be used to optimize storage footprint.  
+- *jpg_quality* = JPEG snapshot quality. The normal range for JPEG is 2-31 with 31 being the worst quality. Can be used to optimize storage footprint. Use 99 to for a JPEG screen grab.
   **Once a snapshot is taken, its quality cannot be increased.**
 - *ffmpeg_crf* = Use Constant Rate Factor (CRF) to control the quality of the timelapse video. The default is 28. See [H.265 documentation](https://trac.ffmpeg.org/wiki/Encode/H.265).
 - *rtsp_uri* = RTSP stream URI
@@ -31,6 +31,7 @@ Example contents of `cameras.txt`
 
 	entrance 20 28 rtsp://192.168.1.100/user=monitor_password=pdTzQLK6Iq_channel=1_stream=0.sdp
 	backyard 25 40 rtsp://192.168.1.101/user=monitor_password=6oLA64UG_channel=1_stream=0.sdp
+	sidedoor 99 00 http://192.168.1.102/ISAPI/Streaming/channels/101/picture?snapShotImageType=JPEG
 
 Set proper permissions (`cameras.txt` is likely to contain credentials)
 

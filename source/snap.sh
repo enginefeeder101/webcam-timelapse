@@ -18,7 +18,11 @@ while read line; do
 	IMGDIR="${CAMDIR}img/"
 	IMG="${IMGDIR}${DATETIME}.jpg"
 	mkdir -m 700 -p "$IMGDIR"
-	"$FFMPEG" $FFMPEG_COMMON -skip_frame nokey -i "${wcparam[3]}" -vsync vfr -f image2 -q:v ${wcparam[1]} -frames:v 1 "$IMG" &
+	if [ "${wcparam[1]}" = "99" ]; then
+		curl -s "${wcparam[3]}" -o "$IMG"
+	else
+		"$FFMPEG" $FFMPEG_COMMON -skip_frame nokey -i "${wcparam[3]}" -vsync vfr -f image2 -q:v ${wcparam[1]} -frames:v 1 "$IMG" &
+	fi
 	echo "file '$IMG'" >> "${CAMDIR}/unprocessed.txt"
 done < "$CAMERA_LIST"
 
