@@ -2,7 +2,7 @@ FROM alpine:3
 
 RUN true \
     && apk upgrade --no-cache \
-    && apk add --no-cache busybox-suid ffmpeg loksh \
+    && apk add --no-cache busybox-suid ffmpeg loksh curl \
     && mkdir -p /config /data \
     && touch /config/cameras.txt \
     && rm -rf /etc/periodic /etc/crontabs/root
